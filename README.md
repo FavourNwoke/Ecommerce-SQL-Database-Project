@@ -13,6 +13,7 @@ Orders (1-to-Many) → Order_Items
 Products (1-to-Many) → Order_Items
 
 CRUD OPERATORS;
+
 Queries to demonstrate:
 Adding a new customer.
 Updating product stock.
@@ -20,12 +21,15 @@ Deleting an order.
 Retrieving orders for a specific customer.
 
 ANALYTICAL QUERIES;
+
 Revenue analysis.
 Identifying top customers.
 Finding best-selling products.
 Customers with no purchases.
 Monthly trends.
+
 QUERY OUTPUTS
+
 Screenshots or exported query results (tables/charts).
 
 INSIGHT;
