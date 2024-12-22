@@ -1,0 +1,198 @@
+-- Schema Design for E-Commerce Database
+-- Create the Database:
+CREATE DATABASE ecommerce;
+
+-- Switch to the Database:
+USE ecommerce;
+
+-- Customers Table
+CREATE TABLE Customers (
+    customer_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone_number VARCHAR(15),
+    address TEXT
+);
+
+-- Products Table
+CREATE TABLE Products (
+    product_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    product_name VARCHAR(100) NOT NULL,
+    category VARCHAR(50),
+    price DECIMAL(10, 2) NOT NULL,
+    stock_quantity INT NOT NULL
+);
+
+-- Orders Table
+CREATE TABLE Orders (
+    order_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT UNSIGNED NOT NULL,
+    order_date DATE NOT NULL,
+    total_amount DECIMAL(10, 2),
+    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id) ON DELETE CASCADE
+);
+
+-- Order_Items Table
+CREATE TABLE Order_Items (
+    order_item_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    order_id INT UNSIGNED NOT NULL,
+    product_id INT UNSIGNED NOT NULL,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2),
+    FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE
+);
+
+-- Data Population
+-- Populate Customers
+INSERT INTO Customers (name, email, phone_number, address)
+VALUES
+('Alice Smith', 'alice@example.com', '123-456-7890', '123 Maple St, Springfield, IL'),
+('Bob Jones', 'bob@example.com', '987-654-3210', '456 Oak St, Metropolis, NY'),
+('Charlie Brown', 'charlie@example.com', '555-555-5555', '789 Pine St, Gotham, NJ'),
+('Diana Prince', 'diana@example.com', '111-222-3333', '101 Wonder St, Paradise, CA'),
+('Bruce Wayne', 'bruce@wayneenterprises.com', '123-321-1234', '1007 Mountain Dr, Gotham, NJ'),
+('Clark Kent', 'clark.kent@example.com', '111-222-0000', '344 Clinton St, Metropolis, NY'),
+('Peter Parker', 'spiderman@dailybugle.com', '888-555-1234', '20 Ingram St, Queens, NY'),
+('Tony Stark', 'tony.stark@starkindustries.com', '999-999-9999', '10880 Malibu Point, Malibu, CA'),
+('Natasha Romanoff', 'natasha@example.com', '777-777-7777', '100 Black Widow Blvd, Moscow, RU'),
+('Steve Rogers', 'steve@example.com', '555-555-0001', '1941 Shield Ave, Brooklyn, NY');
+
+-- Populate Products
+INSERT INTO Products (product_name, category, price, stock_quantity)
+VALUES
+('Laptop', 'Electronics', 1200.00, 50),
+('Phone', 'Electronics', 800.00, 30),
+('Headphones', 'Accessories', 150.00, 100),
+('Smartwatch', 'Electronics', 200.00, 25),
+('Tablet', 'Electronics', 600.00, 40),
+('Keyboard', 'Accessories', 50.00, 200),
+('Mouse', 'Accessories', 30.00, 300),
+('Monitor', 'Electronics', 300.00, 70),
+('Printer', 'Electronics', 150.00, 15),
+('Webcam', 'Accessories', 80.00, 120);
+
+-- Populate Orders
+INSERT INTO Orders (customer_id, order_date, total_amount)
+VALUES
+(1, '2024-01-01', 1350.00),
+(2, '2024-01-02', 1200.00),
+(3, '2024-01-03', 800.00),
+(4, '2024-01-04', 1000.00),
+(5, '2024-01-05', 700.00),
+(6, '2024-01-06', 1500.00),
+(7, '2024-01-07', 1800.00),
+(8, '2024-01-08', 400.00),
+(9, '2024-01-09', 950.00),
+(10, '2024-01-10', 300.00);
+
+-- Populate Order_Items
+INSERT INTO Order_Items (order_id, product_id, quantity, price)
+VALUES
+(1, 1, 1, 1200.00),
+(1, 3, 1, 150.00),
+(2, 1, 1, 1200.00),
+(3, 2, 1, 800.00),
+(4, 4, 5, 200.00),
+(5, 5, 1, 600.00),
+(5, 6, 2, 50.00),
+(6, 7, 10, 30.00),
+(7, 8, 2, 300.00),
+(8, 9, 1, 150.00),
+(9, 10, 2, 80.00),
+(10, 3, 2, 150.00);
+
+-- CRUD Operations
+-- Add a new customer
+INSERT INTO Customers (name, email, phone_number, address)
+VALUES ('Wanda Maximoff', 'wanda@example.com', '123-123-1234', 'Magic Lane, Sokovia');
+
+-- Update stock after a purchase
+UPDATE Products
+SET stock_quantity = stock_quantity - 2
+WHERE product_id = 1;
+
+-- Delete an order
+DELETE FROM Orders WHERE order_id = 10;
+
+-- Retrieve all orders for Alice Smith
+SELECT o.order_id, o.order_date, o.total_amount
+FROM Orders o
+JOIN Customers c ON o.customer_id = c.customer_id
+WHERE c.name = 'Alice Smith';
+
+-- Analytical Queries
+-- Total Revenue
+SELECT SUM(total_amount) AS total_revenue FROM Orders;
+
+-- Revenue by Product
+SELECT p.product_name, SUM(oi.quantity * oi.price) AS revenue
+FROM Order_Items oi
+JOIN Products p ON oi.product_id = p.product_id
+GROUP BY p.product_name
+ORDER BY revenue DESC;
+
+-- Top 5 Customers by Spending
+SELECT c.name, SUM(o.total_amount) AS total_spent
+FROM Customers c
+JOIN Orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name
+ORDER BY total_spent DESC
+LIMIT 5;
+
+-- Customers Without Purchases
+SELECT name FROM Customers
+WHERE customer_id NOT IN (SELECT DISTINCT customer_id FROM Orders);
+
+-- Top 3 Best-Selling Products
+SELECT p.product_name, SUM(oi.quantity) AS total_sold
+FROM Order_Items oi
+JOIN Products p ON oi.product_id = p.product_id
+GROUP BY p.product_name
+ORDER BY total_sold DESC
+LIMIT 3;
+
+-- Out of Stock Products
+SELECT product_name FROM Products WHERE stock_quantity = 0;
+
+-- Items in a Specific Order
+SELECT oi.order_id, p.product_name, oi.quantity, oi.price
+FROM Order_Items oi
+JOIN Products p ON oi.product_id = p.product_id
+WHERE oi.order_id = 1;
+
+-- Total Amount of an Order
+SELECT order_id, SUM(quantity * price) AS total_order_amount
+FROM Order_Items
+WHERE order_id = 1
+GROUP BY order_id;
+
+-- Monthly Trends
+SELECT DATE_FORMAT(order_date, '%Y-%m') AS month,
+       COUNT(order_id) AS total_orders,
+       SUM(total_amount) AS total_revenue
+FROM Orders
+GROUP BY month
+ORDER BY month;
+
+-- Advanced SQL Concepts
+-- Rank Customers by Total Spending
+SELECT c.name, 
+       SUM(o.total_amount) AS total_spent,
+       RANK() OVER (ORDER BY SUM(o.total_amount) DESC) AS `rank`
+FROM Customers c
+JOIN Orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name;
+
+-- CTE: Customers with Revenue > $500
+WITH CustomerRevenue AS (
+    SELECT c.customer_id, c.name, SUM(o.total_amount) AS total_spent
+    FROM Customers c
+    JOIN Orders o ON c.customer_id = o.customer_id
+    GROUP BY c.customer_id, c.name
+)
+SELECT name, total_spent FROM CustomerRevenue WHERE total_spent > 500;
+
+-- Indexing for Optimization
+CREATE INDEX idx_customer_id ON Orders(customer_id);
+CREATE INDEX idx_product_id ON Order_Items(product_id);
