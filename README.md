@@ -3,20 +3,23 @@
 This project plan for SQL provides an excellent opportunity to demonstrate your understanding of database management and analytical queries. Below is a structured approach to complete both the SQL projects effectively:
 
 REPORT
-SHEMA DESIGN
+
+SHEMA DESIGN;
 ER Diagram: Visual representation of the database structure.
 Tables: Customers, Products, Orders, Order_Items.
 Relationships:
 Customers (1-to-Many) → Orders
 Orders (1-to-Many) → Order_Items
 Products (1-to-Many) → Order_Items
-CRUD OPERATORS
+
+CRUD OPERATORS;
 Queries to demonstrate:
 Adding a new customer.
 Updating product stock.
 Deleting an order.
 Retrieving orders for a specific customer.
-ANALYTICAL QUERIES
+
+ANALYTICAL QUERIES;
 Revenue analysis.
 Identifying top customers.
 Finding best-selling products.
@@ -24,7 +27,8 @@ Customers with no purchases.
 Monthly trends.
 QUERY OUTPUTS
 Screenshots or exported query results (tables/charts).
-INSIGHT
+
+INSIGHT;
 1. Revenue Analysis
 Total Revenue Generated: The platform has generated $11,000 in total revenue across all orders.
 Revenue by Product:
